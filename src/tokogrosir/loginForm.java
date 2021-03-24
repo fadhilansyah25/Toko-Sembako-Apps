@@ -5,10 +5,7 @@
  */
 package tokogrosir;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,11 +13,9 @@ import javax.swing.JOptionPane;
  * @author Fadhilansyah25
  */
 public class loginForm extends javax.swing.JFrame {
-    private Connection conn_FadilArdiansyah;
-    private Statement stat_FadilArdiansyah;
-    private ResultSet res_FadilArdiansyah;
-    public String user1, pass1,username, password ;
-    Dashboard_v1 menu = new Dashboard_v1();
+    private Connection con;
+    private Statement stat;
+    private ResultSet res;
     /**
      * Creates new form loginForm
      */
@@ -46,6 +41,7 @@ public class loginForm extends javax.swing.JFrame {
         passsword_textfield = new javax.swing.JPasswordField();
         login_button = new javax.swing.JButton();
         header_label = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Login");
@@ -75,46 +71,52 @@ public class loginForm extends javax.swing.JFrame {
         header_label.setFont(new java.awt.Font("Poppins SemiBold", 0, 48)); // NOI18N
         header_label.setText("Toko Sembako XYZ");
 
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgSource/gambar-sembako.jpg"))); // NOI18N
+
         javax.swing.GroupLayout backgroundLayout = new javax.swing.GroupLayout(background);
         background.setLayout(backgroundLayout);
         backgroundLayout.setHorizontalGroup(
             backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backgroundLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(username_textfield, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
-                    .addComponent(login_button, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(passsword_textfield, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(50, 50, 50))
             .addGroup(backgroundLayout.createSequentialGroup()
-                .addGap(64, 64, 64)
-                .addComponent(header_label)
-                .addContainerGap(306, Short.MAX_VALUE))
+                .addGap(50, 50, 50)
+                .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(backgroundLayout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(92, 92, 92)
+                        .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(username_textfield, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+                            .addComponent(login_button, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(passsword_textfield, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(header_label))
+                .addContainerGap(111, Short.MAX_VALUE))
         );
 
         backgroundLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel1, jLabel2, username_textfield});
 
         backgroundLayout.setVerticalGroup(
             backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(backgroundLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backgroundLayout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addComponent(header_label)
-                .addGap(32, 32, 32)
-                .addComponent(jLabel3)
-                .addGap(29, 29, 29)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(username_textfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(passsword_textfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(42, 42, 42)
-                .addComponent(login_button)
-                .addContainerGap(122, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(backgroundLayout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(username_textfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(passsword_textfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(42, 42, 42)
+                        .addComponent(login_button))
+                    .addComponent(jLabel4))
+                .addGap(124, 124, 124))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -129,26 +131,28 @@ public class loginForm extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void login_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_login_buttonActionPerformed
         // TODO add your handling code here:
-        String sql_FadiArdiansyah;
+        String query;
+        String username, password, userDB = null, passDB = null;
         username = username_textfield.getText();
         password = new String(passsword_textfield.getPassword());
+        Dashboard menu = new Dashboard();
 
         try {
-            sql_FadiArdiansyah = "SELECT * FROM username_login WHERE username='"+username+"' AND password='"+password+"'";
-            res_FadilArdiansyah = stat_FadilArdiansyah.executeQuery(sql_FadiArdiansyah);
-            while(res_FadilArdiansyah.next()) {
-                user1 = res_FadilArdiansyah.getString("username");
-                pass1 = res_FadilArdiansyah.getString("password");
+            query = "SELECT * FROM username_login WHERE username='"+username+"' AND password='"+password+"'";
+            res = stat.executeQuery(query);
+            while(res.next()) {
+                userDB = res.getString("username");
+                passDB = new String(res.getString("password"));
             }
-            if ( username.equals(user1) && password.equals(new String(pass1))) {
+            if ( username.equals(userDB) && password.equals(passDB) ) {
                 JOptionPane.showMessageDialog(null, "berhasil login");
                 this.setVisible(false);
                 menu.setVisible(true);
-                menu.usernameLogin.setText(username);
             } else {
                 JOptionPane.showMessageDialog(null, "Maaf user dan password anda salah !!");
             }
@@ -199,6 +203,7 @@ public class loginForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JButton login_button;
     private javax.swing.JPasswordField passsword_textfield;
     private javax.swing.JTextField username_textfield;
@@ -207,8 +212,8 @@ public class loginForm extends javax.swing.JFrame {
     private void koneksi() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn_FadilArdiansyah = DriverManager.getConnection("jdbc:mysql://127.0.0.1/tokoSembako", "root", "");
-            stat_FadilArdiansyah = conn_FadilArdiansyah.createStatement();
+            con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/tokoSembako", "root", "");
+            stat = con.createStatement();
         } catch (Exception e) {
             //TODO: handle exception
             JOptionPane.showMessageDialog(null, e);
