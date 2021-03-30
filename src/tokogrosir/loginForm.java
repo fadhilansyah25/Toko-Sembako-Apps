@@ -134,8 +134,7 @@ public class loginForm extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void login_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_login_buttonActionPerformed
-        // TODO add your handling code here:
+    private void login_buttonActionPerformed(java.awt.event.ActionEvent evt) {
         String query;
         String username, password, userDB = null, passDB = null;
         username = username_textfield.getText();
@@ -157,7 +156,6 @@ public class loginForm extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Maaf user dan password anda salah !!");
             }
         } catch (Exception e) {
-            //TODO: handle exception
             JOptionPane.showMessageDialog(null, e);
         }
     }//GEN-LAST:event_login_buttonActionPerformed
@@ -215,7 +213,6 @@ public class loginForm extends javax.swing.JFrame {
             con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/tokoSembako", "root", "");
             stat = con.createStatement();
         } catch (Exception e) {
-            //TODO: handle exception
             JOptionPane.showMessageDialog(null, e);
         }
     }

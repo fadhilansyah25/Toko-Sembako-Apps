@@ -17,18 +17,21 @@ public class Dashboard extends javax.swing.JFrame {
     private Connection con;
     private Statement stat;
     private ResultSet res;
-    String id_barang;
+    String id_barang, id_supplier;
     /**
      * Creates new form Dashboard
      */
     public Dashboard() {
         initComponents();
         koneksi();
-        // Method Panel barang
+        // Method Panel Barang
         loadTabel_barang();
-        loadTabel_supplier();
         kosongkan_formBarang();
         comboBox_formbarang();
+
+        // Method Panel Supplier
+        loadTabel_supplier();
+        kosongkan_formSupplier();
     }
 
     /**
@@ -432,6 +435,11 @@ public class Dashboard extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tabel_supplier.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabel_supplierMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabel_supplier);
 
         jLabel12.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
@@ -447,12 +455,32 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel15.setText("Alamat");
 
         BTadd_supplier.setText("Add Data");
+        BTadd_supplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BTadd_supplierActionPerformed(evt);
+            }
+        });
 
         BTedit_supplier.setText("Edit Data");
+        BTedit_supplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BTedit_supplierActionPerformed(evt);
+            }
+        });
 
         BTdelete_supplier.setText("Delete Data");
+        BTdelete_supplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BTdelete_supplierActionPerformed(evt);
+            }
+        });
 
         BTrefresh_supplier.setText("Refresh All");
+        BTrefresh_supplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BTrefresh_supplierActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelSupplierLayout = new javax.swing.GroupLayout(panelSupplier);
         panelSupplier.setLayout(panelSupplierLayout);
@@ -467,7 +495,6 @@ public class Dashboard extends javax.swing.JFrame {
                             .addComponent(JTnama_supplier, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(JTnomor_supplier, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(JTalamat_supplier, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel12)
                             .addComponent(jLabel13)
                             .addComponent(jLabel14)
                             .addComponent(jLabel15)
@@ -480,11 +507,13 @@ public class Dashboard extends javax.swing.JFrame {
                                         .addComponent(BTedit_supplier)))
                                 .addGap(18, 18, 18)
                                 .addComponent(BTdelete_supplier)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 770, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(46, 46, 46))
+                        .addGap(45, 45, 45))
                     .addGroup(panelSupplierLayout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addGroup(panelSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel12)
+                            .addComponent(jLabel2))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
@@ -495,14 +524,11 @@ public class Dashboard extends javax.swing.JFrame {
             .addGroup(panelSupplierLayout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addComponent(jLabel2)
+                .addGap(50, 50, 50)
+                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelSupplierLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelSupplierLayout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelSupplierLayout.createSequentialGroup()
-                        .addGap(50, 50, 50)
-                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(JTidSupplier_supplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(30, 30, 30)
                         .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -522,8 +548,9 @@ public class Dashboard extends javax.swing.JFrame {
                             .addComponent(BTedit_supplier)
                             .addComponent(BTdelete_supplier))
                         .addGap(33, 33, 33)
-                        .addComponent(BTrefresh_supplier)))
-                .addContainerGap(187, Short.MAX_VALUE))
+                        .addComponent(BTrefresh_supplier))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(158, Short.MAX_VALUE))
         );
 
         mainPanel.add(panelSupplier, "card3");
@@ -729,6 +756,92 @@ public class Dashboard extends javax.swing.JFrame {
         loadTabel_barang();
     }
 
+    // EVENT PANEL DATA SUPPLIER
+    private void BTadd_supplierActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            stat.executeUpdate("Insert Into datasupplier Values('"
+            +JTidSupplier_supplier.getText()+"','"
+            +JTnama_supplier.getText()+"','"
+            +JTnomor_supplier.getText()+"','"
+            +JTalamat_supplier.getText()+"')"
+            );
+            kosongkan_formSupplier();
+            loadTabel_supplier();
+            JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan");
+        } catch (HeadlessException | SQLException e) {
+            JOptionPane.showMessageDialog(null, "Data Gagal Disimpan "+e);
+        }
+    }
+
+    private void BTedit_supplierActionPerformed(java.awt.event.ActionEvent evt) {
+        int ok = JOptionPane.showConfirmDialog(null, "Apakah ingin mengupdate data ini?"
+        , "Edit Data", JOptionPane.YES_NO_CANCEL_OPTION);
+        try {
+            PreparedStatement statEdit = con.prepareStatement(
+                "Update datasupplier set id_supplier=?, nama_supplier=?, no_telepon=?, alamat=? Where id_supplier='"
+                +id_supplier+"'"
+            );
+            if (ok == 0) {
+                try {
+                    statEdit.setString(1, JTidSupplier_supplier.getText());
+                    statEdit.setString(2, JTnama_supplier.getText());
+                    statEdit.setString(3, JTnomor_supplier.getText());
+                    statEdit.setString(4, JTalamat_supplier.getText());
+                    statEdit.executeUpdate();
+                    loadTabel_supplier();
+                    kosongkan_formSupplier();
+
+                    JOptionPane.showMessageDialog(null, "Data Berhasil Di Update");
+                } catch (HeadlessException | NumberFormatException | SQLException e) {
+                    JOptionPane.showMessageDialog(null, "Data Gagal Di Update "+e);
+                }
+            }
+        } catch (HeadlessException | SQLException e) {
+        }
+    }
+
+    private void BTdelete_supplierActionPerformed(java.awt.event.ActionEvent evt) {
+        int ok = JOptionPane.showConfirmDialog(null, "Apakah Yakin Menghapus Data?",
+        "Hapus Data", JOptionPane.YES_NO_CANCEL_OPTION);
+        if (ok == 0) {
+            try {
+                String sql = "Delete From datasupplier where id_supplier='"
+                +JTidSupplier_supplier.getText()+"'";
+                PreparedStatement statDelete = con.prepareStatement(sql);
+                statDelete.executeUpdate();
+                loadTabel_supplier();
+                kosongkan_formSupplier();
+
+                JOptionPane.showMessageDialog(null, "Hapus Data Berhasil");
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Hapus Data Gagal "+e);
+            }
+        }
+    }
+
+    private void BTrefresh_supplierActionPerformed(java.awt.event.ActionEvent evt) {
+        kosongkan_formSupplier();
+        loadTabel_supplier();
+    }
+
+    private void tabel_supplierMouseClicked(java.awt.event.MouseEvent evt) {
+        int i_FadilArdiansyah = tabel_supplier.getSelectedRow();
+        if (i_FadilArdiansyah == -1) {
+            return;
+        }
+
+        id_supplier = (String)tabel_supplier.getValueAt(i_FadilArdiansyah, 0);
+        String data1 = (String)tabel_supplier.getValueAt(i_FadilArdiansyah, 1);
+        String data2 = (String)tabel_supplier.getValueAt(i_FadilArdiansyah, 2);
+        String data3 = (String)tabel_supplier.getValueAt(i_FadilArdiansyah, 3);
+
+
+        JTidSupplier_supplier.setText(id_supplier);
+        JTnama_supplier.setText(data1);
+        JTnomor_supplier.setText(data2);
+        JTalamat_supplier.setText(data3);
+    }
+
     // =========================================================================================================
 
     /**
@@ -759,10 +872,8 @@ public class Dashboard extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Dashboard().setVisible(true);                
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new Dashboard().setVisible(true);
         });
     }
 
@@ -829,7 +940,7 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     // Method Panel data barang
-    public void loadTabel_barang() {
+    public final void loadTabel_barang() {
         DefaultTableModel tabel = new DefaultTableModel();
         tabel.addColumn("kode barang");
         tabel.addColumn("Nama Barang");
@@ -877,7 +988,6 @@ public class Dashboard extends javax.swing.JFrame {
                 CBnamaSupplier.addItem(res.getString("nama_supplier"));
             }
         } catch (SQLException e) {
-            //TODO: handle exception
             JOptionPane.showMessageDialog(null, e);
         }
     }
@@ -892,14 +1002,13 @@ public class Dashboard extends javax.swing.JFrame {
                     JTsupplier_barang.setText(res.getString("id_supplier"));
                 }
             }
-        } catch (Exception e) {
-            //TODO: handle exception
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(rootPane, e);
         }
     }
 
-
-    public void loadTabel_supplier() {
+    // Method Panel data supplier
+    public final void loadTabel_supplier() {
         DefaultTableModel tabel = new DefaultTableModel();
         tabel.addColumn("ID Supplier");
         tabel.addColumn("Nama Supplier");
@@ -922,6 +1031,10 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }
 
-    // Method Panel data supplier
-
+    private void kosongkan_formSupplier() {
+        JTidSupplier_supplier.setText("");
+        JTnama_supplier.setText("");
+        JTnomor_supplier.setText("");
+        JTalamat_supplier.setText("");
+    }
 }
