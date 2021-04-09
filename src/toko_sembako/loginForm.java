@@ -13,15 +13,15 @@ import javax.swing.JOptionPane;
  * @author Fadhilansyah25
  */
 public class loginForm extends javax.swing.JFrame {
-    private Connection con;
-    private Statement stat;
-    private ResultSet res;
+    Connection con;
+    PreparedStatement pst;
+    ResultSet res;
     /**
      * Creates new form loginForm
      */
     public loginForm() {
         initComponents();
-        koneksi();
+        con = database.koneksiDB();
     }
 
     /**
@@ -143,7 +143,8 @@ public class loginForm extends javax.swing.JFrame {
 
         try {
             query = "SELECT * FROM username_login WHERE username='"+username+"' AND password='"+password+"'";
-            res = stat.executeQuery(query);
+            pst = con.prepareStatement(query);
+            res = pst.executeQuery();
             while(res.next()) {
                 userDB = res.getString("username");
                 passDB = new String(res.getString("password"));
@@ -206,14 +207,4 @@ public class loginForm extends javax.swing.JFrame {
     private javax.swing.JPasswordField passsword_textfield;
     private javax.swing.JTextField username_textfield;
     // End of variables declaration//GEN-END:variables
-
-    private void koneksi() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/tokoSembako", "root", "");
-            stat = con.createStatement();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
-    }
 }

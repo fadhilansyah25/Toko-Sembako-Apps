@@ -14,16 +14,17 @@ import javax.swing.table.DefaultTableModel;
  * @author Fadhilansyah25
  */
 public class Dashboard extends javax.swing.JFrame {
-    private Connection con;
-    private Statement stat;
-    private ResultSet res;
+    Connection con;
+    Statement stat;
+    PreparedStatement pst;
+    ResultSet res;
     String id_barang, id_supplier;
     /**
      * Creates new form Dashboard
      */
     public Dashboard() {
         initComponents();
-        koneksi();
+        con = database.koneksiDB();
         // Method Panel Barang
         loadTabel_barang();
         kosongkan_formBarang();
@@ -32,6 +33,110 @@ public class Dashboard extends javax.swing.JFrame {
         // Method Panel Supplier
         loadTabel_supplier();
         kosongkan_formSupplier();
+    }
+
+    // Method Panel data barang
+    public final void loadTabel_barang() {
+        DefaultTableModel tabel = new DefaultTableModel();
+        tabel.addColumn("kode barang");
+        tabel.addColumn("Nama Barang");
+        tabel.addColumn("Satuan");
+        tabel.addColumn("Kode Supplier");
+        tabel.addColumn("Supplier");
+        tabel.addColumn("Stok Barang");
+        tabel.addColumn("Harga Barang");
+        tabel_barang.setModel(tabel);
+
+        try {
+            String sql = "Select * From databarang inner join datasupplier on databarang.id_supplier=datasupplier.id_supplier";
+            pst = con.prepareStatement(sql);
+            res = pst.executeQuery();
+            while (res.next()) {
+            tabel.addRow(new Object[]{
+                res.getString("kode_barang"),
+                res.getString("nama_barang"),
+                res.getString("satuan"),
+                res.getString("id_supplier"),
+                res.getString("nama_supplier"),
+                res.getString("stok"),
+                res.getString("harga")
+            });
+        }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void kosongkan_formBarang() {
+        JTkode_barang.setText("");
+        JTnama_barang.setText("");
+        JTsatuan_barang.setText("");
+        CBnamaSupplier.setSelectedIndex(-1);
+        JTsupplier_barang.setText("");
+        JTstok_barang.setText("");
+        JTharga_barang.setText("");
+    }
+
+    private void comboBox_formbarang() {
+        try {
+            String sql = "select nama_supplier from datasupplier order by nama_supplier asc";
+            pst = con.prepareStatement(sql);
+            res = pst.executeQuery();
+            CBnamaSupplier.removeAllItems();
+            while (res.next()) {
+                CBnamaSupplier.addItem(res.getString("nama_supplier"));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void idSupplier_barang() {
+        try {
+            String sql = "select id_supplier from datasupplier where nama_supplier='"+CBnamaSupplier.getSelectedItem()+"'";
+            pst = con.prepareStatement(sql);
+            res = pst.executeQuery();
+
+            while (res.next()) {
+                {   
+                    JTsupplier_barang.setText(res.getString("id_supplier"));
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(rootPane, e);
+        }
+    }
+
+    // Method Panel data supplier
+    public final void loadTabel_supplier() {
+        DefaultTableModel tabel = new DefaultTableModel();
+        tabel.addColumn("ID Supplier");
+        tabel.addColumn("Nama Supplier");
+        tabel.addColumn("No. Telepon");
+        tabel.addColumn("Alamat");
+        tabel_supplier.setModel(tabel);
+
+        try {
+            pst = con.prepareStatement("Select * From datasupplier");
+            res = pst.executeQuery();
+            while (res.next()) {
+            tabel.addRow(new Object[]{
+                res.getString("id_supplier"),
+                res.getString("nama_supplier"),
+                res.getString("no_telepon"),
+                res.getString("alamat")
+            });
+        }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void kosongkan_formSupplier() {
+        JTidSupplier_supplier.setText("");
+        JTnama_supplier.setText("");
+        JTnomor_supplier.setText("");
+        JTalamat_supplier.setText("");
     }
 
     /**
@@ -658,6 +763,7 @@ public class Dashboard extends javax.swing.JFrame {
     // EVENT PANEL DATA BARANG
     private void BTinsert_barangActionPerformed(java.awt.event.ActionEvent evt) {
         try {
+            stat = con.createStatement();
             stat.executeUpdate("Insert Into databarang Values('"
             +JTkode_barang.getText()+"','"
             +JTnama_barang.getText()+"','"
@@ -702,19 +808,19 @@ public class Dashboard extends javax.swing.JFrame {
         int ok = JOptionPane.showConfirmDialog(null, "Apakah ingin mengupdate data ini?"
         , "Edit Data", JOptionPane.YES_NO_CANCEL_OPTION);
         try {
-            PreparedStatement statEdit = con.prepareStatement(
+            pst = con.prepareStatement(
                 "Update databarang set kode_barang=?, nama_barang=?, satuan=?, id_supplier=?, stok=?, harga=? Where kode_barang='"
                 +id_barang+"'"
             );
             if (ok == 0) {
                 try {
-                    statEdit.setString(1, JTkode_barang.getText());
-                    statEdit.setString(2, JTnama_barang.getText());
-                    statEdit.setString(3, JTsatuan_barang.getText());
-                    statEdit.setString(4, JTsupplier_barang.getText());
-                    statEdit.setInt(5, Integer.parseInt(JTstok_barang.getText()));
-                    statEdit.setInt(6, Integer.parseInt(JTharga_barang.getText()));
-                    statEdit.executeUpdate();
+                    pst.setString(1, JTkode_barang.getText());
+                    pst.setString(2, JTnama_barang.getText());
+                    pst.setString(3, JTsatuan_barang.getText());
+                    pst.setString(4, JTsupplier_barang.getText());
+                    pst.setInt(5, Integer.parseInt(JTstok_barang.getText()));
+                    pst.setInt(6, Integer.parseInt(JTharga_barang.getText()));
+                    pst.executeUpdate();
                     loadTabel_barang();
                     kosongkan_formBarang();
 
@@ -734,8 +840,8 @@ public class Dashboard extends javax.swing.JFrame {
             try {
                 String sql = "Delete From tbl_bayarkas where KodeBayar='"
                 +JTkode_barang.getText()+"'";
-                PreparedStatement statDelete = con.prepareStatement(sql);
-                statDelete.executeUpdate();
+                pst = con.prepareStatement(sql);
+                pst.executeUpdate();
                 loadTabel_barang();
                 kosongkan_formBarang();
 
@@ -759,6 +865,7 @@ public class Dashboard extends javax.swing.JFrame {
     // EVENT PANEL DATA SUPPLIER
     private void BTadd_supplierActionPerformed(java.awt.event.ActionEvent evt) {
         try {
+            stat = con.createStatement();
             stat.executeUpdate("Insert Into datasupplier Values('"
             +JTidSupplier_supplier.getText()+"','"
             +JTnama_supplier.getText()+"','"
@@ -777,17 +884,17 @@ public class Dashboard extends javax.swing.JFrame {
         int ok = JOptionPane.showConfirmDialog(null, "Apakah ingin mengupdate data ini?"
         , "Edit Data", JOptionPane.YES_NO_CANCEL_OPTION);
         try {
-            PreparedStatement statEdit = con.prepareStatement(
+            pst = con.prepareStatement(
                 "Update datasupplier set id_supplier=?, nama_supplier=?, no_telepon=?, alamat=? Where id_supplier='"
                 +id_supplier+"'"
             );
             if (ok == 0) {
                 try {
-                    statEdit.setString(1, JTidSupplier_supplier.getText());
-                    statEdit.setString(2, JTnama_supplier.getText());
-                    statEdit.setString(3, JTnomor_supplier.getText());
-                    statEdit.setString(4, JTalamat_supplier.getText());
-                    statEdit.executeUpdate();
+                    pst.setString(1, JTidSupplier_supplier.getText());
+                    pst.setString(2, JTnama_supplier.getText());
+                    pst.setString(3, JTnomor_supplier.getText());
+                    pst.setString(4, JTalamat_supplier.getText());
+                    pst.executeUpdate();
                     loadTabel_supplier();
                     kosongkan_formSupplier();
 
@@ -807,8 +914,8 @@ public class Dashboard extends javax.swing.JFrame {
             try {
                 String sql = "Delete From datasupplier where id_supplier='"
                 +JTidSupplier_supplier.getText()+"'";
-                PreparedStatement statDelete = con.prepareStatement(sql);
-                statDelete.executeUpdate();
+                pst = con.prepareStatement(sql);
+                pst.executeUpdate();
                 loadTabel_supplier();
                 kosongkan_formSupplier();
 
@@ -928,113 +1035,4 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JTable tabel_barang;
     private javax.swing.JTable tabel_supplier;
     // End of variables declaration//GEN-END:variables
-
-    private void koneksi() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/tokoSembako", "root", "");
-            stat = con.createStatement();
-        } catch (ClassNotFoundException | SQLException e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
-    }
-
-    // Method Panel data barang
-    public final void loadTabel_barang() {
-        DefaultTableModel tabel = new DefaultTableModel();
-        tabel.addColumn("kode barang");
-        tabel.addColumn("Nama Barang");
-        tabel.addColumn("Satuan");
-        tabel.addColumn("Kode Supplier");
-        tabel.addColumn("Supplier");
-        tabel.addColumn("Stok Barang");
-        tabel.addColumn("Harga Barang");
-        tabel_barang.setModel(tabel);
-
-        try {
-            res = stat.executeQuery("Select * From databarang inner join datasupplier on databarang.id_supplier=datasupplier.id_supplier");
-            while (res.next()) {
-            tabel.addRow(new Object[]{
-                res.getString("kode_barang"),
-                res.getString("nama_barang"),
-                res.getString("satuan"),
-                res.getString("id_supplier"),
-                res.getString("nama_supplier"),
-                res.getString("stok"),
-                res.getString("harga")
-            });
-        }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
-    }
-
-    private void kosongkan_formBarang() {
-        JTkode_barang.setText("");
-        JTnama_barang.setText("");
-        JTsatuan_barang.setText("");
-        CBnamaSupplier.setSelectedIndex(-1);
-        JTsupplier_barang.setText("");
-        JTstok_barang.setText("");
-        JTharga_barang.setText("");
-    }
-
-    private void comboBox_formbarang() {
-        try {
-            String sql = "select nama_supplier from datasupplier order by nama_supplier asc";
-            res = stat.executeQuery(sql);
-            CBnamaSupplier.removeAllItems();
-            while (res.next()) {
-                CBnamaSupplier.addItem(res.getString("nama_supplier"));
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
-    }
-
-    private void idSupplier_barang() {
-        try {
-            String sql = "select id_supplier from datasupplier where nama_supplier='"+CBnamaSupplier.getSelectedItem()+"'";
-            res = stat.executeQuery(sql);
-
-            while (res.next()) {
-                {   
-                    JTsupplier_barang.setText(res.getString("id_supplier"));
-                }
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(rootPane, e);
-        }
-    }
-
-    // Method Panel data supplier
-    public final void loadTabel_supplier() {
-        DefaultTableModel tabel = new DefaultTableModel();
-        tabel.addColumn("ID Supplier");
-        tabel.addColumn("Nama Supplier");
-        tabel.addColumn("No. Telepon");
-        tabel.addColumn("Alamat");
-        tabel_supplier.setModel(tabel);
-
-        try {
-            res = stat.executeQuery("Select * From datasupplier");
-            while (res.next()) {
-            tabel.addRow(new Object[]{
-                res.getString("id_supplier"),
-                res.getString("nama_supplier"),
-                res.getString("no_telepon"),
-                res.getString("alamat")
-            });
-        }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
-    }
-
-    private void kosongkan_formSupplier() {
-        JTidSupplier_supplier.setText("");
-        JTnama_supplier.setText("");
-        JTnomor_supplier.setText("");
-        JTalamat_supplier.setText("");
-    }
 }
