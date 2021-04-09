@@ -136,7 +136,7 @@ public class loginForm extends javax.swing.JFrame {
 
     private void login_buttonActionPerformed(java.awt.event.ActionEvent evt) {
         String query;
-        String username, password, userDB = null, passDB = null;
+        String username, nama_user = null, password, userDB = null, passDB = null, id_username = null;
         username = username_textfield.getText();
         password = new String(passsword_textfield.getPassword());
         Dashboard menu = new Dashboard();
@@ -146,12 +146,17 @@ public class loginForm extends javax.swing.JFrame {
             pst = con.prepareStatement(query);
             res = pst.executeQuery();
             while(res.next()) {
+                id_username = res.getString("id_username");
                 userDB = res.getString("username");
+                nama_user = res.getString("nama");
                 passDB = new String(res.getString("password"));
             }
             if ( username.equals(userDB) && password.equals(passDB) ) {
                 JOptionPane.showMessageDialog(null, "berhasil login");
                 this.setVisible(false);
+                menu.namaUser_jLabel1.setText(nama_user);
+                menu.username_jLabel.setText(userDB);
+                menu.id_username = id_username;
                 menu.setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(null, "Maaf user dan password anda salah !!");
