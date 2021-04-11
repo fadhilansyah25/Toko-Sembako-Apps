@@ -9,6 +9,10 @@ import java.awt.*;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import java.util.*;
+import java.text.*;
+import java.util.logging.*;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -19,7 +23,11 @@ public class Dashboard extends javax.swing.JFrame {
     Statement stat;
     PreparedStatement pst;
     ResultSet res;
-    String id_barang, id_supplier, id_username;
+    String id_barang, id_supplier;
+    // Deklarasi variabel penting Transaksi
+    String kode_barang;
+    int harga_barang, stok_barang, sub_total, diskon;
+    DefaultTableModel modelList;
 
     /**
      * Creates new form Dashboard
@@ -35,7 +43,23 @@ public class Dashboard extends javax.swing.JFrame {
         // Method Panel Supplier
         loadTabel_supplier();
         kosongkan_formSupplier();
+
+        // Method Panel Transaksi
+        delay();
+        autonumber();
+        // Tabel ListCart
+        modelList = new DefaultTableModel();
+        listCartBarang_jTable.setModel(modelList);
+        modelList.addColumn("Kode Detail");
+        modelList.addColumn("Kode Barang");
+        modelList.addColumn("Harga");
+        modelList.addColumn("Jumlah");
+        modelList.addColumn("Diskon");
+        modelList.addColumn("Sub Total");
+        sum();
     }
+
+    // ===============================================================================================
 
     // Method Panel data barang
     public final void loadTabel_barang() {
@@ -132,12 +156,149 @@ public class Dashboard extends javax.swing.JFrame {
         JTalamat_supplier.setText("");
     }
 
+    // Method Panel Transaksi
+    public final void delay() {
+        Thread clock = new Thread() {
+            public void run() {
+                for (;;) {
+                    Calendar cal = Calendar.getInstance();
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+                    SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
+                    Jam_jTextField.setText(format.format(cal.getTime()));
+                    Tanggal_jTextField1.setText(format2.format(cal.getTime()));
+
+                    try {
+                        sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
+        clock.start();
+    }
+
+    public void cari_barang() {
+        try {
+            String sql = "select * from databarang where nama_barang LIKE '%" + cariBarang_jTextField.getText() + "%'";
+            pst = con.prepareStatement(sql);
+            res = pst.executeQuery();
+            hasilCariBarang_jTable.setModel(DbUtils.resultSetToTableModel(res));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    public void autonumber() {
+        try {
+            String sql = "SELECT MAX(RIGHT(Kode_Transaksi,3)) AS NO FROM transaksi_penjualan";
+            pst = con.prepareStatement(sql);
+            res = pst.executeQuery();
+            while (res.next()) {
+                if (res.first() == false) {
+                    kodeTransaki_jTextField.setText("TRX001");
+                } else {
+                    res.last();
+                    int auto_id = res.getInt(1) + 1;
+                    String no = String.valueOf(auto_id);
+                    int NomorJual = no.length();
+                    for (int j = 0; j < 3 - NomorJual; j++) {
+                        no = "0" + no;
+                    }
+                    kodeTransaki_jTextField.setText("TRX" + no);
+                }
+            }
+            res.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    public void subtotal() {
+        int jumlah;
+        if (discountBarang_jTextField.getText().equals("")) {
+            diskon = 0;
+        } else {
+            diskon = Integer.parseInt(discountBarang_jTextField.getSelectedText());
+        }
+        jumlah = Integer.parseInt(JumlahBarang_jTextField.getText());
+        sub_total = (jumlah * harga_barang) - diskon;
+    }
+
+    public void sum() {
+        int totalBiaya = 0;
+        int subtotal;
+        DefaultTableModel dataModel = (DefaultTableModel) listCartBarang_jTable.getModel();
+        int jumlah = listCartBarang_jTable.getRowCount();
+        for (int i = 0; i < jumlah; i++) {
+            subtotal = Integer.parseInt(dataModel.getValueAt(i, 5).toString());
+            totalBiaya += subtotal;
+        }
+        totalBiaya_jTextField.setText(String.valueOf(totalBiaya));
+    }
+
+    public void simpan_transaksi() {
+        String tgl = Tanggal_jTextField1.getText();
+        String jam = Jam_jTextField.getText();
+        String kode_detail = "D" + kodeTransaki_jTextField.getText();
+        String id_username = username_jLabel.getText();
+        
+        try {
+            String sql = "insert into transaksi_penjualan (Kode_Transaksi, Kode_Detail_transaksi, id_username, tanggal, jam, total_transaksi) value (?, ?, ?, ?, ?, ?)";
+            pst = con.prepareStatement(sql);
+            pst.setString(1, kodeTransaki_jTextField.getText());
+            pst.setString(2, kode_detail);
+            pst.setString(3, id_username);
+            pst.setString(4, tgl);
+            pst.setString(5, jam);
+            pst.setString(6, totalBiaya_jTextField.getText());
+            pst.execute();
+            JOptionPane.showMessageDialog(null, "Data Tersimpan");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    public void simpan_detailTransaksi() {
+        try {
+                DefaultTableModel dataModel = (DefaultTableModel) listCartBarang_jTable.getModel();
+                int rows = listCartBarang_jTable.getRowCount();
+                con.setAutoCommit(false);
+
+                String sql = "Insert Into detail_trans_penjualan(kode_detail_transaksi, kode_barang, harga, jumlah, discount, subtotal) values (?, ?, ?, ?, ?, ?)";
+                pst = con.prepareStatement(sql);
+                for(int row = 0; row < rows; row++){
+                        String kode_detail = (String) dataModel.getValueAt(row, 0);
+                        String kode_barang = (String) dataModel.getValueAt(row, 1);
+                        int harga = Integer.parseInt(dataModel.getValueAt(row, 2).toString());
+                        int jumlah = Integer.parseInt(dataModel.getValueAt(row, 3).toString());
+                        int discount = Integer.parseInt(dataModel.getValueAt(row, 4).toString());
+                        int subTotal = Integer.parseInt(dataModel.getValueAt(row, 5).toString());
+                        pst.setString(1, kode_detail);
+                        pst.setString(2, kode_barang);
+                        pst.setInt(3, harga);
+                        pst.setInt(4, jumlah);
+                        pst.setInt(5, discount);
+                        pst.setInt(6, subTotal);
+
+                        pst.addBatch();
+                }
+                pst.executeBatch();
+                con.commit();
+        } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    // ===============================================================================================
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -216,7 +377,7 @@ public class Dashboard extends javax.swing.JFrame {
         kurangiCart_jButton = new javax.swing.JButton();
         jLabel26 = new javax.swing.JLabel();
         jLabel27 = new javax.swing.JLabel();
-        totalHarga_jTextField = new javax.swing.JTextField();
+        totalBiaya_jTextField = new javax.swing.JTextField();
         jLabel28 = new javax.swing.JLabel();
         bayarTrans_jTextField = new javax.swing.JTextField();
         jLabel29 = new javax.swing.JLabel();
@@ -379,20 +540,20 @@ public class Dashboard extends javax.swing.JFrame {
 
         jLabel16.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel16.setText("Username :");
+        jLabel16.setText("ID User     :");
 
         jLabel17.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel17.setText("Nama       :");
+        jLabel17.setText("Nama         :");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(22, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
                     .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -778,9 +939,15 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel19.setText("Masukan Nama Barang");
 
         cariBarang_jTextField.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        cariBarang_jTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        cariBarang_jTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        cariBarang_jTextField.setToolTipText("");
 
         cariBarang_jButton.setText("Cari");
+        cariBarang_jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cariBarang_jButtonActionPerformed(evt);
+            }
+        });
 
         hasilCariBarang_jTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -793,6 +960,11 @@ public class Dashboard extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        hasilCariBarang_jTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                hasilCariBarang_jTableMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(hasilCariBarang_jTable);
 
         listCartBarang_jTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -808,15 +980,16 @@ public class Dashboard extends javax.swing.JFrame {
         ));
         jScrollPane4.setViewportView(listCartBarang_jTable);
 
-        JumlahBarang_jTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
         jLabel20.setText("Jumlah");
-
-        discountBarang_jTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel21.setText("Discount");
 
         tambahCart_jButton.setText("Tambah");
+        tambahCart_jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tambahCart_jButtonActionPerformed(evt);
+            }
+        });
 
         jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel22.setText("Tambahkan Cart");
@@ -831,9 +1004,15 @@ public class Dashboard extends javax.swing.JFrame {
         kodeTransaki_jTextField.setEditable(false);
         kodeTransaki_jTextField.setBackground(new java.awt.Color(204, 204, 204));
         kodeTransaki_jTextField.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        kodeTransaki_jTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         kodeTransaki_jTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         kurangiCart_jButton.setText("Hapus");
+        kurangiCart_jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                kurangiCart_jButtonActionPerformed(evt);
+            }
+        });
 
         jLabel26.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel26.setText("Kurangi Cart");
@@ -842,16 +1021,16 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel27.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel27.setText("TOTAL ");
 
-        totalHarga_jTextField.setEditable(false);
-        totalHarga_jTextField.setBackground(new java.awt.Color(204, 204, 204));
-        totalHarga_jTextField.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        totalHarga_jTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        totalBiaya_jTextField.setEditable(false);
+        totalBiaya_jTextField.setBackground(new java.awt.Color(204, 204, 204));
+        totalBiaya_jTextField.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        totalBiaya_jTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        totalBiaya_jTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel28.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel28.setText("BAYAR");
 
         bayarTrans_jTextField.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        bayarTrans_jTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel29.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel29.setText("KEMBALIAN");
@@ -859,9 +1038,20 @@ public class Dashboard extends javax.swing.JFrame {
         kembalian_jTextField.setEditable(false);
         kembalian_jTextField.setBackground(new java.awt.Color(204, 204, 204));
         kembalian_jTextField.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        kembalian_jTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         kembalian_jTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        kembalian_jTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                kembalian_jTextFieldMouseClicked(evt);
+            }
+        });
 
         simpanTrans_jButton.setText("BAYAR");
+        simpanTrans_jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                simpanTrans_jButtonActionPerformed(evt);
+            }
+        });
 
         transBaru_jButton.setText("NEW");
 
@@ -869,12 +1059,14 @@ public class Dashboard extends javax.swing.JFrame {
         Jam_jTextField.setBackground(new java.awt.Color(255, 51, 51));
         Jam_jTextField.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         Jam_jTextField.setForeground(new java.awt.Color(255, 255, 255));
+        Jam_jTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         Jam_jTextField.setBorder(null);
 
         Tanggal_jTextField1.setEditable(false);
         Tanggal_jTextField1.setBackground(new java.awt.Color(255, 51, 51));
         Tanggal_jTextField1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         Tanggal_jTextField1.setForeground(new java.awt.Color(255, 255, 255));
+        Tanggal_jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         Tanggal_jTextField1.setBorder(null);
 
         javax.swing.GroupLayout panelTransasksiLayout = new javax.swing.GroupLayout(panelTransasksi);
@@ -921,7 +1113,7 @@ public class Dashboard extends javax.swing.JFrame {
                                 .addGap(27, 27, 27)
                                 .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(bayarTrans_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(totalHarga_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(totalBiaya_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(kembalian_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -982,7 +1174,7 @@ public class Dashboard extends javax.swing.JFrame {
                                     .addComponent(tambahCart_jButton)))
                             .addGroup(panelTransasksiLayout.createSequentialGroup()
                                 .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(totalHarga_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(totalBiaya_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel27))
                                 .addGap(18, 18, 18)
                                 .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1287,6 +1479,65 @@ public class Dashboard extends javax.swing.JFrame {
         JTalamat_supplier.setText(data3);
     }
 
+    // EVENT PANEL TRANSAKSI
+    private void cariBarang_jButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        cari_barang();
+    }
+
+
+    private void tambahCart_jButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        subtotal();
+        String kode_detail = "D" + kodeTransaki_jTextField.getText();
+        String hargaBarang = String.valueOf(harga_barang);
+        String diskonBarang = String.valueOf(diskon);
+        String subTotal = String.valueOf(sub_total);
+        String jumlahBarang = JumlahBarang_jTextField.getText();
+        
+        modelList.addRow(new Object[]{kode_detail, kode_barang, hargaBarang, jumlahBarang, diskonBarang, subTotal});
+        sum();
+
+        JumlahBarang_jTextField.setText("");
+        discountBarang_jTextField.setText("");
+    }
+
+    private void hasilCariBarang_jTableMouseClicked(java.awt.event.MouseEvent evt) {
+        try {
+            int row = hasilCariBarang_jTable.getSelectedRow();
+            String kodeBarang = (String) hasilCariBarang_jTable.getValueAt(row, 0);
+            String sql = "select * from databarang where kode_barang='"+kodeBarang +"'";
+            pst = con.prepareStatement(sql);
+            res = pst.executeQuery();
+            if (res.next()) {
+                kode_barang = res.getString("kode_barang");
+                harga_barang = res.getInt("harga");
+                stok_barang = res.getInt("stok");
+            } 
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void kurangiCart_jButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        DefaultTableModel model = (DefaultTableModel) listCartBarang_jTable.getModel();
+        int[] rows = listCartBarang_jTable.getSelectedRows();
+        for( int i=0; i<rows.length; i++){
+          model.removeRow(rows[i]-i);
+        }
+        sum();
+    }
+
+    private void kembalian_jTextFieldMouseClicked(java.awt.event.MouseEvent evt) {
+        int totalBiaya  = Integer.parseInt(totalBiaya_jTextField.getText());
+        int bayar = Integer.parseInt(bayarTrans_jTextField.getText());
+        int kembalian = bayar - totalBiaya;
+        kembalian_jTextField.setText(String.valueOf(kembalian));
+    }
+
+    private void simpanTrans_jButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        simpan_transaksi();
+        simpan_detailTransaksi();
+    }
+
     // =========================================================================================================
 
     /**
@@ -1408,7 +1659,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JTable tabel_barang;
     private javax.swing.JTable tabel_supplier;
     private javax.swing.JButton tambahCart_jButton;
-    private javax.swing.JTextField totalHarga_jTextField;
+    private javax.swing.JTextField totalBiaya_jTextField;
     private javax.swing.JButton transBaru_jButton;
     private javax.swing.JPanel transaksi_tabBut;
     public static final javax.swing.JLabel username_jLabel = new javax.swing.JLabel();

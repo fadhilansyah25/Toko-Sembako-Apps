@@ -155,8 +155,7 @@ public class loginForm extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "berhasil login");
                 this.setVisible(false);
                 menu.namaUser_jLabel1.setText(nama_user);
-                menu.username_jLabel.setText(userDB);
-                menu.id_username = id_username;
+                menu.username_jLabel.setText(id_username);
                 menu.setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(null, "Maaf user dan password anda salah !!");
