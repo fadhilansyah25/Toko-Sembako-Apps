@@ -69,7 +69,7 @@ public class loginForm extends javax.swing.JFrame {
         });
 
         header_label.setFont(new java.awt.Font("Poppins SemiBold", 0, 48)); // NOI18N
-        header_label.setText("Toko Sembako XYZ");
+        header_label.setText("TOKO SEMBAKO DIDIN");
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgSource/gambar-sembako.jpg"))); // NOI18N
 

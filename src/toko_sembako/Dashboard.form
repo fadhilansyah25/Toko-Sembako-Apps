@@ -56,7 +56,7 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Component id="mainPanel" alignment="0" max="32767" attributes="0"/>
-              <Component id="sidePanel" alignment="0" pref="701" max="32767" attributes="0"/>
+              <Component id="sidePanel" alignment="0" pref="706" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -140,7 +140,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="dataBarang_tg" pref="30" max="32767" attributes="0"/>
+                          <Component id="dataBarang_tg" pref="28" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -941,26 +941,9 @@
                               <Component id="jLabel24" min="-2" max="-2" attributes="0"/>
                               <Component id="jScrollPane4" min="-2" pref="531" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <Component id="simpanTrans_jButton" min="-2" pref="121" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                                          <Component id="transBaru_jButton" min="-2" pref="121" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="jLabel28" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jLabel29" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jLabel27" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                              <Component id="bayarTrans_jTextField" alignment="1" min="-2" pref="151" max="-2" attributes="0"/>
-                                              <Component id="totalBiaya_jTextField" alignment="1" min="-2" pref="151" max="-2" attributes="0"/>
-                                              <Component id="kembalian_jTextField" alignment="1" min="-2" pref="151" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                  </Group>
+                                  <Component id="simpanTrans_jButton" min="-2" pref="121" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                                  <Component id="transBaru_jButton" min="-2" pref="121" max="-2" attributes="0"/>
                                   <EmptySpace max="32767" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="kurangiCart_jButton" alignment="1" min="-2" pref="100" max="-2" attributes="0"/>
@@ -982,6 +965,21 @@
                                           <Component id="Jam_jTextField" min="-2" pref="114" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jLabel28" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel29" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel27" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                      <Component id="bayarTrans_jTextField" alignment="1" min="-2" pref="151" max="-2" attributes="0"/>
+                                      <Component id="totalBiaya_jTextField" alignment="1" min="-2" pref="151" max="-2" attributes="0"/>
+                                      <Component id="kembalian_jTextField" alignment="1" min="-2" pref="151" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+                                  <Component id="CetakNotaTrans_jButton" min="-2" pref="100" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
@@ -1049,6 +1047,7 @@
                                           <Group type="103" groupAlignment="3" attributes="0">
                                               <Component id="kembalian_jTextField" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
                                               <Component id="jLabel29" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Component id="CetakNotaTrans_jButton" alignment="3" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
                                       <Component id="jLabel20" min="-2" max="-2" attributes="0"/>
@@ -1301,6 +1300,9 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="NEW"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transBaru_jButtonActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JTextField" name="Jam_jTextField">
                   <Properties>
@@ -1338,6 +1340,14 @@
                     </Property>
                   </Properties>
                 </Component>
+                <Component class="javax.swing.JButton" name="CetakNotaTrans_jButton">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cetak Nota"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CetakNotaTrans_jButtonActionPerformed"/>
+                  </Events>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="panelLaporanTr">
@@ -1359,31 +1369,31 @@
                           <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="jScrollPane5" min="-2" pref="1100" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="jLabel30" max="32767" attributes="0"/>
                                       <Component id="jDateChooser1" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="jDateChooser2" pref="187" max="32767" attributes="0"/>
+                                  <Component id="jDateChooser2" max="32767" attributes="0"/>
                                   <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                                   <Component id="searchTgl_jButton" min="-2" pref="75" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="refreshLaporan_jButton" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="556" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="cetakLaporan_jButton" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="116" max="-2" attributes="0"/>
+                                  <Component id="kdTransLP_jTextField" min="-2" pref="113" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                                  <Component id="cetakNota_jButton1" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jScrollPane6" min="-2" pref="1100" max="-2" attributes="0"/>
-                                      <Component id="jLabel32" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel31" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <Component id="jLabel31" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                                  <Component id="jLabel32" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jScrollPane6" min="-2" pref="1100" max="-2" attributes="0"/>
                               </Group>
+                              <Component id="jScrollPane5" alignment="0" min="-2" pref="1100" max="-2" attributes="0"/>
                           </Group>
+                          <EmptySpace min="0" pref="37" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1399,13 +1409,16 @@
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="searchTgl_jButton" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="refreshLaporan_jButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="cetakLaporan_jButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="kdTransLP_jTextField" alignment="3" pref="25" max="32767" attributes="0"/>
+                                  <Component id="cetakNota_jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="jLabel31" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jScrollPane5" min="-2" pref="285" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
                           <Component id="jLabel32" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jScrollPane6" min="-2" pref="146" max="-2" attributes="0"/>
@@ -1503,6 +1516,24 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="refreshLaporan_jButtonActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="cetakNota_jButton1">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cetak Nota"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cetakNota_jButton1ActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="cetakLaporan_jButton">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="cetak Laporan"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cetakLaporan_jButtonActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JTextField" name="kdTransLP_jTextField">
                 </Component>
               </SubComponents>
             </Container>

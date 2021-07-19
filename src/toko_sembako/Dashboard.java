@@ -13,6 +13,16 @@ import java.util.*;
 import java.text.*;
 import java.util.logging.*;
 import net.proteanit.sql.DbUtils;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
+import java.util.HashMap;
+import java.util.Map;
+import java.io.File;
 
 /**
  *
@@ -29,6 +39,14 @@ public class Dashboard extends javax.swing.JFrame {
     String kode_barang;
     int harga_barang, stok_barang, sub_total, diskon;
     DefaultTableModel modelList;
+
+    // Declare Jasper Variable
+    JasperDesign JasDes;
+    JasperReport JasRep;
+    JasperPrint JasPri;
+
+    // Panel Laporan Transaksi
+    String kode_tr;
 
     /**
      * Creates new form Dashboard
@@ -305,6 +323,19 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }
 
+    public void cetak_nota(String kode_trans) {
+        try {
+            String NamaFile = "./src/report/Nota.jasper";
+            HashMap param = new HashMap();
+            //Mengambil parameter
+            param.put("kodeTrans", kode_trans);
+            JasperPrint JPrint = JasperFillManager.fillReport(NamaFile, param, con);
+            JasperViewer.viewReport(JPrint, false);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
     // ===============================================================================================
     /**
      * This method is called from within the constructor to initialize the form.
@@ -404,6 +435,7 @@ public class Dashboard extends javax.swing.JFrame {
         transBaru_jButton = new javax.swing.JButton();
         Jam_jTextField = new javax.swing.JTextField();
         Tanggal_jTextField1 = new javax.swing.JTextField();
+        CetakNotaTrans_jButton = new javax.swing.JButton();
         panelLaporanTr = new javax.swing.JPanel();
         jLabel30 = new javax.swing.JLabel();
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
@@ -416,6 +448,9 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel32 = new javax.swing.JLabel();
         searchTgl_jButton = new javax.swing.JButton();
         refreshLaporan_jButton = new javax.swing.JButton();
+        cetakNota_jButton1 = new javax.swing.JButton();
+        cetakLaporan_jButton = new javax.swing.JButton();
+        kdTransLP_jTextField = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -458,7 +493,7 @@ public class Dashboard extends javax.swing.JFrame {
             dataBarang_tabButLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dataBarang_tabButLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(dataBarang_tg, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                .addComponent(dataBarang_tg, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1095,6 +1130,11 @@ public class Dashboard extends javax.swing.JFrame {
         });
 
         transBaru_jButton.setText("NEW");
+        transBaru_jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                transBaru_jButtonActionPerformed(evt);
+            }
+        });
 
         Jam_jTextField.setEditable(false);
         Jam_jTextField.setBackground(new java.awt.Color(255, 51, 51));
@@ -1109,6 +1149,13 @@ public class Dashboard extends javax.swing.JFrame {
         Tanggal_jTextField1.setForeground(new java.awt.Color(255, 255, 255));
         Tanggal_jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         Tanggal_jTextField1.setBorder(null);
+
+        CetakNotaTrans_jButton.setText("Cetak Nota");
+        CetakNotaTrans_jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CetakNotaTrans_jButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelTransasksiLayout = new javax.swing.GroupLayout(panelTransasksi);
         panelTransasksi.setLayout(panelTransasksiLayout);
@@ -1141,21 +1188,9 @@ public class Dashboard extends javax.swing.JFrame {
                     .addComponent(jLabel24)
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 531, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelTransasksiLayout.createSequentialGroup()
-                        .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelTransasksiLayout.createSequentialGroup()
-                                .addComponent(simpanTrans_jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(24, 24, 24)
-                                .addComponent(transBaru_jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelTransasksiLayout.createSequentialGroup()
-                                .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel28)
-                                    .addComponent(jLabel29)
-                                    .addComponent(jLabel27))
-                                .addGap(27, 27, 27)
-                                .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(bayarTrans_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(totalBiaya_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(kembalian_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(simpanTrans_jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(24, 24, 24)
+                        .addComponent(transBaru_jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(kurangiCart_jButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1170,7 +1205,19 @@ public class Dashboard extends javax.swing.JFrame {
                                 .addComponent(kodeTransaki_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(panelTransasksiLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(Jam_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(Jam_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(panelTransasksiLayout.createSequentialGroup()
+                        .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel28)
+                            .addComponent(jLabel29)
+                            .addComponent(jLabel27))
+                        .addGap(27, 27, 27)
+                        .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(bayarTrans_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(totalBiaya_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kembalian_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(34, 34, 34)
+                        .addComponent(CetakNotaTrans_jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(47, 47, 47))
         );
         panelTransasksiLayout.setVerticalGroup(
@@ -1224,7 +1271,8 @@ public class Dashboard extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(kembalian_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel29)))
+                                    .addComponent(jLabel29)
+                                    .addComponent(CetakNotaTrans_jButton)))
                             .addComponent(jLabel20))
                         .addGap(41, 41, 41)
                         .addGroup(panelTransasksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1293,6 +1341,20 @@ public class Dashboard extends javax.swing.JFrame {
             }
         });
 
+        cetakNota_jButton1.setText("Cetak Nota");
+        cetakNota_jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cetakNota_jButton1ActionPerformed(evt);
+            }
+        });
+
+        cetakLaporan_jButton.setText("cetak Laporan");
+        cetakLaporan_jButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cetakLaporan_jButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelLaporanTrLayout = new javax.swing.GroupLayout(panelLaporanTr);
         panelLaporanTr.setLayout(panelLaporanTrLayout);
         panelLaporanTrLayout.setHorizontalGroup(
@@ -1301,25 +1363,27 @@ public class Dashboard extends javax.swing.JFrame {
                 .addGap(30, 30, 30)
                 .addGroup(panelLaporanTrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelLaporanTrLayout.createSequentialGroup()
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 1100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(panelLaporanTrLayout.createSequentialGroup()
                         .addGroup(panelLaporanTrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel30, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addComponent(jDateChooser2, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
+                        .addComponent(jDateChooser2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(27, 27, 27)
                         .addComponent(searchTgl_jButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(refreshLaporan_jButton)
-                        .addGap(556, 556, 556))
-                    .addGroup(panelLaporanTrLayout.createSequentialGroup()
-                        .addGroup(panelLaporanTrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 1100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel32)
-                            .addComponent(jLabel31))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(18, 18, 18)
+                        .addComponent(cetakLaporan_jButton)
+                        .addGap(116, 116, 116)
+                        .addComponent(kdTransLP_jTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(28, 28, 28)
+                        .addComponent(cetakNota_jButton1))
+                    .addComponent(jLabel31)
+                    .addGroup(panelLaporanTrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jLabel32, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 1100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 1100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 37, Short.MAX_VALUE))
         );
         panelLaporanTrLayout.setVerticalGroup(
             panelLaporanTrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1332,12 +1396,15 @@ public class Dashboard extends javax.swing.JFrame {
                     .addComponent(jDateChooser2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelLaporanTrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(searchTgl_jButton)
-                        .addComponent(refreshLaporan_jButton)))
+                        .addComponent(refreshLaporan_jButton)
+                        .addComponent(cetakLaporan_jButton)
+                        .addComponent(kdTransLP_jTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                        .addComponent(cetakNota_jButton1)))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel31)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(47, 47, 47)
+                .addGap(43, 43, 43)
                 .addComponent(jLabel32)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1371,7 +1438,7 @@ public class Dashboard extends javax.swing.JFrame {
         backgroundLayout.setVerticalGroup(
             backgroundLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(sidePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+            .addComponent(sidePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1409,6 +1476,49 @@ public class Dashboard extends javax.swing.JFrame {
     private void refreshLaporan_jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshLaporan_jButtonActionPerformed
         load_tabelPenjualan();
     }//GEN-LAST:event_refreshLaporan_jButtonActionPerformed
+
+    private void cetakNota_jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakNota_jButton1ActionPerformed
+        // TODO add your handling code here:
+        cetak_nota(kdTransLP_jTextField.getText());
+    }//GEN-LAST:event_cetakNota_jButton1ActionPerformed
+
+    private void transBaru_jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transBaru_jButtonActionPerformed
+        for (int i = modelList.getRowCount() - 1; i >= 0; i--) {
+            modelList.removeRow(i);
+        }
+        totalBiaya_jTextField.setText("0");
+        JumlahBarang_jTextField.setText("");
+        discountBarang_jTextField.setText("");
+        kembalian_jTextField.setText("");
+        bayarTrans_jTextField.setText("");
+        autonumber();
+    }//GEN-LAST:event_transBaru_jButtonActionPerformed
+
+    private void CetakNotaTrans_jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CetakNotaTrans_jButtonActionPerformed
+        // TODO add your handling code here:
+        kode_tr = kodeTransaki_jTextField.getText();
+        
+        cetak_nota(kode_tr);
+    }//GEN-LAST:event_CetakNotaTrans_jButtonActionPerformed
+
+    private void cetakLaporan_jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakLaporan_jButtonActionPerformed
+        // TODO add your handling code here:
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String tanggal = format.format(jDateChooser1.getDate());
+            String sql;
+            String tanggal2 = format.format(jDateChooser2.getDate());
+            
+            String NamaFile = "./src/report/laporan_penjualan.jasper";
+            HashMap param = new HashMap();
+            //Mengambil parameter
+            param.put("tanggal1", tanggal);
+            param.put("tanggal2", tanggal2);
+            JasperPrint JPrint = JasperFillManager.fillReport(NamaFile, param, con);
+            JasperViewer.viewReport(JPrint, false);
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_cetakLaporan_jButtonActionPerformed
 
     // =========================================================================================================
     // EVENT SIDE PANEL
@@ -1724,6 +1834,22 @@ public class Dashboard extends javax.swing.JFrame {
     private void simpanTrans_jButtonActionPerformed(java.awt.event.ActionEvent evt) {
         simpan_transaksi();
         simpan_detailTransaksi();
+
+        int ok = JOptionPane.showConfirmDialog(null, "Apakah Ingin Mencetak Nota", "Cetak Nota", JOptionPane.YES_NO_OPTION);
+        if (ok == 0) {
+            try {
+                String kode = null;
+                String sql = "SELECT kode_transaksi FROM transaksi_penjualan WHERE kode_transaksi=(SELECT max(kode_transaksi) FROM transaksi_penjualan)";
+                pst = con.prepareStatement(sql);
+                res = pst.executeQuery();
+
+                if (res.next()) {
+                    kode = res.getString("kode_transaksi");
+                }
+                cetak_nota(kode);
+            } catch (Exception e) {
+            }
+        }
     }
 
     // EVENT PANEL LAPORAN PENJUALAN
@@ -1731,11 +1857,13 @@ public class Dashboard extends javax.swing.JFrame {
         try {
             int row = dataTransaksi_jTable.getSelectedRow();
             String Kode_detail = (String) dataTransaksi_jTable.getValueAt(row, 1);
+            kode_tr = (String) dataTransaksi_jTable.getValueAt(row, 0);
             String sql = "select * from detail_trans_penjualan where kode_detail_transaksi='" + Kode_detail + "'";
             pst = con.prepareStatement(sql);
             res = pst.executeQuery();
             detailTransaksi_jTable.setModel(DbUtils.resultSetToTableModel(res));
-        } catch (Exception e) {
+            kdTransLP_jTextField.setText(kode_tr);
+        } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         }
     }
@@ -1787,6 +1915,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton BTrefresh_barang;
     private javax.swing.JButton BTrefresh_supplier;
     private javax.swing.JComboBox<String> CBnamaSupplier;
+    private javax.swing.JButton CetakNotaTrans_jButton;
     private javax.swing.JTextField JTalamat_supplier;
     private javax.swing.JTextField JTharga_barang;
     private javax.swing.JTextField JTidSupplier_supplier;
@@ -1804,6 +1933,8 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JTextField bayarTrans_jTextField;
     private javax.swing.JButton cariBarang_jButton;
     private javax.swing.JTextField cariBarang_jTextField;
+    private javax.swing.JButton cetakLaporan_jButton;
+    private javax.swing.JButton cetakNota_jButton1;
     private javax.swing.JPanel dataBarang_tabBut;
     private javax.swing.JLabel dataBarang_tg;
     private javax.swing.JPanel dataPenjualan_tabBut;
@@ -1853,6 +1984,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JTextField kdTransLP_jTextField;
     private javax.swing.JTextField kembalian_jTextField;
     private javax.swing.JTextField kodeTransaki_jTextField;
     private javax.swing.JButton kurangiCart_jButton;
